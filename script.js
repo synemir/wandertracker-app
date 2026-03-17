@@ -1,10 +1,26 @@
 let data = JSON.parse(localStorage.getItem("wanderdata")) || [];
+let editIndex = null;
 
 function formatKm(value) {
   return Number(value).toFixed(1);
 }
 
-function addEntry() {
+function saveData() {
+  localStorage.setItem("wanderdata", JSON.stringify(data));
+}
+
+function resetForm() {
+  document.getElementById("date").value = "";
+  document.getElementById("km").value = "";
+  document.getElementById("route").value = "";
+
+  editIndex = null;
+  document.getElementById("formTitle").textContent = "Neue Wanderung";
+  document.getElementById("saveButton").textContent = "Speichern";
+  document.getElementById("cancelButton").style.display = "none";
+}
+
+function saveEntry() {
   const date = document.getElementById("date").value;
   const kmInput = document.getElementById("km").value;
   const route = document.getElementById("route").value.trim();
@@ -21,20 +37,53 @@ function addEntry() {
     return;
   }
 
-  data.push({ date, km, route });
+  const entry = { date, km, route };
 
-  localStorage.setItem("wanderdata", JSON.stringify(data));
+  if (editIndex === null) {
+    data.push(entry);
+  } else {
+    data[editIndex] = entry;
+  }
 
-  document.getElementById("date").value = "";
-  document.getElementById("km").value = "";
-  document.getElementById("route").value = "";
-
+  saveData();
+  resetForm();
   render();
 }
 
+function editEntry(index) {
+  const item = data[index];
+
+  document.getElementById("date").value = item.date;
+  document.getElementById("km").value = item.km;
+  document.getElementById("route").value = item.route || "";
+
+  editIndex = index;
+  document.getElementById("formTitle").textContent = "Wanderung bearbeiten";
+  document.getElementById("saveButton").textContent = "Änderungen speichern";
+  document.getElementById("cancelButton").style.display = "inline-block";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function cancelEdit() {
+  resetForm();
+}
+
 function deleteEntry(index) {
+  const confirmed = confirm("Diesen Eintrag wirklich löschen?");
+  if (!confirmed) return;
+
   data.splice(index, 1);
-  localStorage.setItem("wanderdata", JSON.stringify(data));
+  saveData();
+
+  if (editIndex === index) {
+    resetForm();
+  }
+
+  if (editIndex !== null && index < editIndex) {
+    editIndex = editIndex - 1;
+  }
+
   render();
 }
 
@@ -42,7 +91,7 @@ function getMonthlyTotals() {
   const monthly = {};
 
   data.forEach(item => {
-    const monthKey = item.date.slice(0, 7); // YYYY-MM
+    const monthKey = item.date.slice(0, 7);
     if (!monthly[monthKey]) {
       monthly[monthKey] = 0;
     }
@@ -61,7 +110,7 @@ function getYearlyTotals() {
   const yearly = {};
 
   data.forEach(item => {
-    const yearKey = item.date.slice(0, 4); // YYYY
+    const yearKey = item.date.slice(0, 4);
     if (!yearly[yearKey]) {
       yearly[yearKey] = 0;
     }
@@ -173,18 +222,22 @@ function renderEntries() {
     return;
   }
 
-  const sortedData = [...data].sort((a, b) => b.date.localeCompare(a.date));
+  const sortedItems = data
+    .map((item, index) => ({ ...item, originalIndex: index }))
+    .sort((a, b) => b.date.localeCompare(a.date));
 
-  sortedData.forEach(item => {
-    const originalIndex = data.findIndex(
-      d => d.date === item.date && d.km === item.km && d.route === item.route
-    );
-
+  sortedItems.forEach(item => {
     const li = document.createElement("li");
+    li.className = "entry-item";
     li.innerHTML = `
-      <strong>${item.date}</strong> – ${formatKm(item.km)} km
-      ${item.route ? "– " + item.route : ""}
-      <button class="delete-btn" onclick="deleteEntry(${originalIndex})">Löschen</button>
+      <div class="entry-content">
+        <strong>${item.date}</strong> – ${formatKm(item.km)} km
+        ${item.route ? "– " + item.route : ""}
+      </div>
+      <div class="entry-actions">
+        <button class="small-btn" onclick="editEntry(${item.originalIndex})">Bearbeiten</button>
+        <button class="small-btn danger-btn" onclick="deleteEntry(${item.originalIndex})">Löschen</button>
+      </div>
     `;
     list.appendChild(li);
   });
