@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Maria Tools</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Meine Tools</h1>
+
+<div class="card">
+  <h2>Wandertracker</h2>
+
+  <input type="date" id="date">
+  <input type="number" id="km" placeholder="Kilometer">
+  <input type="text" id="route" placeholder="Von – Nach">
+
+  <button onclick="addEntry()">Speichern</button>
+</div>
+
+<div class="card">
+  <h2>Einträge</h2>
+  <ul id="list"></ul>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
