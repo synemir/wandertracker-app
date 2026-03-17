@@ -12,7 +12,7 @@
     <h1>Wandertracker</h1>
 
     <div class="card">
-      <h2>Neue Wanderung</h2>
+      <h2 id="formTitle">Neue Wanderung</h2>
 
       <div class="form-grid">
         <div>
@@ -31,7 +31,10 @@
         </div>
       </div>
 
-      <button onclick="addEntry()">Speichern</button>
+      <div class="button-row">
+        <button onclick="saveEntry()" id="saveButton">Speichern</button>
+        <button onclick="cancelEdit()" id="cancelButton" class="secondary-btn" style="display:none;">Abbrechen</button>
+      </div>
     </div>
 
     <div class="card">
