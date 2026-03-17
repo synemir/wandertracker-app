@@ -12,6 +12,16 @@
     <h1>Wandertracker</h1>
 
     <div class="card">
+      <h2>Login / Sync</h2>
+      <div class="button-row">
+        <input type="email" id="email" placeholder="Deine E-Mail">
+        <button onclick="sendMagicLink()">Magic Link senden</button>
+        <button onclick="logout()" class="secondary-btn">Logout</button>
+      </div>
+      <p id="authStatus" class="empty-note">Noch nicht eingeloggt.</p>
+    </div>
+
+    <div class="card">
       <h2 id="formTitle">Neue Wanderung</h2>
 
       <div class="form-grid">
@@ -105,12 +115,17 @@
     </div>
 
     <div class="card">
+      <h2>Monatsdiagramm</h2>
+      <canvas id="monthlyChart" height="220"></canvas>
+    </div>
+
+    <div class="card">
       <h2>Einträge</h2>
       <ul id="list"></ul>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
